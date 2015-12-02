@@ -5,7 +5,7 @@ import socket
 host = ''
 port = 1337
 key = '12345'
-
+clients = 0
 def rtext():
     return os.urandom(4).encode('hex')
 
@@ -19,9 +19,11 @@ def decrypt(data):
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((host,port))
 s.listen(10)
+print 'server started.\nlistening for clients...'
 while 1:
     client, address = s.accept()
     data = client.recv(1024)
+    clients += 1 
     if data:
         print 'Server received', data
         cip = encrypt(data)
@@ -34,6 +36,6 @@ while 1:
         if data:
             print 'Server received', data.encode('hex')
         if(ARC4.new(key).decrypt(data) == ptext):
-            print 'client authenticated.'
-            exit(0)
+            print 'client %d authenticated.'%(clients)
+    	    client.close()
     client.close() 
